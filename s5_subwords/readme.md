@@ -8,7 +8,7 @@ In the folder "run" are the scripts used to interface the recipe. The acoustic a
 Start by running the script "run/run_am.sh", it has all the steps related to the acoustic model training. It creates a standard LDA+MLLT+SAT system followed by a TDNN model, with i-vectors and speed perturbation. The script is a standard Kaldi recipe except for the creation of the dictionary as it uses the text corpus to create a grapheme based lexicon instead of a phoneme based model. The "lang" and "dict" used for the acoustic model training are prefixed with "base" to distinguish them from their subword counterparts, which will be created later. The "lang" and "dict" are derived from the text corpus, so no g2p translation is required. Note that the text corpus must be normalized; one sentence per line, all characters should be lower or upper case, and all non-character related signs like numbers or punctuations should be removed. 
 
 ### Subword model
-The subword realted steps are in run/run_sw.sh. There are scripts for three subword tokenizers:
+The subword related steps are in run/run_sw.sh. There are scripts for three subword tokenizers:
  * [Unigram](https://arxiv.org/abs/1804.10959) 
  * [Byte Pair Encoding](https://arxiv.org/abs/1508.07909)
  * [Morfessor](https://morfessor.readthedocs.io/en/latest/)

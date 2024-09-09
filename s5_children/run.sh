@@ -13,6 +13,14 @@ nj_train=20
 nj_decode=32
 stage=0
 
+# NOTE! In the future the ASR data, LM training text and pronunciation dictionary
+# will be downloaded from online first, e.g. Clarin
+samromur_root=/data/asr/samromur/samromur_ldc
+samromur_teen=/data/asr/samromur/samromur_teen
+lm_train=/models/samromur/rmh_2020-11-23_uniq.txt
+prondict_orig=/models/samromur/prondict_rmh_2020-12-02.txt
+g2p_model=../preprocessing/g2p/ipd_clean_slt2018.mdl
+
 . ./cmd.sh
 . ./path.sh
 # setup the steps and utils directories
@@ -22,13 +30,6 @@ stage=0
 
 set -eo pipefail
 
-# NOTE! In the future the ASR data, LM training text and pronunciation dictionary
-# will be downloaded from online first, e.g. Clarin
-samromur_root=/data/asr/samromur/samromur_ldc
-samromur_teen=/data/asr/samromur/samromur_teen
-lm_train=/models/samromur/rmh_2020-11-23_uniq.txt
-prondict_orig=/models/samromur/prondict_rmh_2020-12-02.txt
-g2p_model=../preprocessing/g2p/ipd_clean_slt2018.mdl
 
 # Created in this script
 prondict=data/prondict_w_samromur.txt
@@ -43,15 +44,26 @@ done
 if [ $stage -le 0 ]; then
   echo "Create ./data directories"
   echo 'Adult speech'
-  python3 local/samromur_prep_data.py "$samromur_root"/audio "$samromur_root"/metadata.tsv data
+  python3 local/samromur_prep_data.py "$samromur_root" "$samromur_root"/metadata.tsv data
   
   echo "Teenage data"
   # Because of speaker ID overlap between adults and teenagers I add the letter t to the teen spkIDs
   sed -r 's/(\.wav[^0-9][0-9]+)\b/\1t/g' "$samromur_teen"/metadata.tsv > data/metadata_teen.tsv
-  # I've removed out the generation of spk2gender for now, since there are also gender N and o
-  # Also, I don't feel like gender will matter for kids
-  python3 local/samromur_prep_data.py "$samromur_teen"/audio data/metadata_teen.tsv data/teen
-  
+  python3 local/samromur_prep_data.py "$samromur_teen" data/metadata_teen.tsv data/teen
+
+  # The directory names of the splits in the datasets are prefixed by `data_` in
+  # Samrómur Children. So fix that:
+  for name in train eval dev; do
+    sed -i 's/\(test\|train\|dev\)/data_\1/' data/teen/$name/wav.scp
+  done
+
+  # The spk2gender actually only allows m and f but the dataset also has o and
+  # N. This isn't documented but I assume it stands for other and unknown. None
+  # of the training scripts use this information so we remove it.
+  for name in train eval dev; do
+    rm data/teen/$name/spk2gender
+    rm data/$name/spk2gender
+  done
 fi
 
 if [ $stage -le 1 ]; then
@@ -100,7 +112,7 @@ if [ $stage -le 3 ]; then
     <(cut -f1 $prondict | sort -u) > data/$n/vocab_text_only.tmp
     nb_oov=$(join -1 1 -2 1 data/$n/vocab_text_only.tmp <(awk '$2 ~ /[[:print:]]/ { print $2" "$1 }' \
     data/$n/words.cnt | sort -k1,1) | sort | awk '{total = total + $2}END{print total}')
-    oov=$(echo "scale=3;$nb_oov/$nb_tokens*100" | bc)
+    oov=$(python3 -c "print($nb_oov/$nb_tokens*100)")
     echo "The out of vocabulary rate for $n is: $oov" || exit 1;
   done > oov_rate
 fi
@@ -237,7 +249,7 @@ if [ $stage -le 11 ]; then
   utils/data/combine_data.sh data/train_w_teen data/train data/teen/train
 fi
 
-if [ $stage -le 1 ]; then
+if [ $stage -le 12 ]; then
   echo "Make MFCC features for adult + teen training set"
   steps/make_mfcc.sh \
   --mfcc-config conf/mfcc.conf \
@@ -245,7 +257,7 @@ if [ $stage -le 1 ]; then
   data/train_w_teen exp/make_mfcc $mfccdir \
   || error 1 "Failed creating MFCC features";
   
-  echo "Comute CMVN"
+  echo "Compute CMVN"
   steps/compute_cmvn_stats.sh \
   data/train_w_teen exp/make_mfcc $mfccdir
   
@@ -260,7 +272,7 @@ if [ $stage -le 1 ]; then
     || error 1 "Failed creating MFCC features";
   done
   
-  echo "Comute CMVN"
+  echo "Compute CMVN"
   for name in eval dev; do
     steps/compute_cmvn_stats.sh \
     data/teen/$name exp/make_mfcc $mfccdir
@@ -270,7 +282,7 @@ if [ $stage -le 1 ]; then
   
 fi
 
-if [ $stage -le 12 ]; then
+if [ $stage -le 13 ]; then
   echo "Aligning the combined training set to tri3"
   steps/align_fmllr.sh \
   --nj $nj_train \
@@ -285,7 +297,7 @@ if [ $stage -le 12 ]; then
   data/lang exp/tri3_ali exp/tri4
 fi
 
-if [ $stage -le 13 ]; then
+if [ $stage -le 14 ]; then
   echo "Triphone tri4 decoding. Adult + teen data."
   $train_cmd --mem 4G exp/tri4/log/mkgraph.log \
   utils/mkgraph.sh \
@@ -327,17 +339,16 @@ if [ $stage -le 13 ]; then
   
 fi
 
-if [ $stage -le 14 ]; then
+if [ $stage -le 15 ]; then
   
   affix=_7n
   speed_perturb=true
-  nohup local/chain/run_tdnn.sh \
+  local/chain/run_tdnn.sh \
   --stage 0 --affix $affix \
   --speed-perturb $speed_perturb \
-  --generate-plots true \
-  data/train_w_teen data >>logs/tdnn$affix.log 2>&1 &
-  # I want to --generate-plots true --zerogram-decoding true \
-  
+  --generate-plots false \
+  data/train_w_teen data
+
   # WER info:
   for x in exp/chain/tdnn"$affix"/decode*; do [ -d "$x" ] && grep WER "$x"/wer_* | utils/best_wer.sh; done >> RESULTS
   

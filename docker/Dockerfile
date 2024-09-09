@@ -45,4 +45,40 @@ RUN git clone --depth 1 https://github.com/kaldi-asr/kaldi.git /opt/kaldi && \
     find /opt/kaldi  -type f \( -name "*.o" -o -name "*.la" -o -name "*.a" \) -exec rm {} \; && \
     rm -rf /opt/kaldi/.git
 
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -yqq --no-install-recommends\
+        python3-pip \
+        libboost-system-dev \
+        libboost-thread-dev \
+        libboost-program-options-dev \
+        libboost-test-dev \
+        libeigen3-dev \
+        zlib1g-dev \
+        libbz2-dev \
+        liblzma-dev \
+        cmake && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN wget https://github.com/kpu/kenlm/archive/f6c947dc943859e265fabce886232205d0fb2b37.zip -O kenlm.zip && \
+    unzip kenlm.zip && \
+    mv kenlm-f6c947dc943859e265fabce886232205d0fb2b37 /opt/kenlm && \
+    cd /opt/kenlm && \
+    mkdir build && \
+    cd build && \
+    cmake .. && \
+    make -j $(nproc) lmplz
+
+RUN pip install \
+    pandas \
+    sequitur-g2p
+
+# This script is currently broken on platforms that do not have the en_US.UTF-8
+# locale. See: https://github.com/kaldi-asr/kaldi/pull/4934
+RUN sed -i 's/if locale -a | grep "C.UTF-8"/if locale -a | grep "C.utf8"/' \
+    /opt/kaldi/egs/wsj/s5/utils/validate_data_dir.sh
+
 WORKDIR /opt/kaldi/
+
+ENV KALDI_ROOT=/opt/kaldi
+ENV PATH="/opt/kenlm/build/bin:$PATH"
+ENV LC_ALL=C.UTF-8

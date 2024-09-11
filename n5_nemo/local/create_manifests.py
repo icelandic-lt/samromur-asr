@@ -33,8 +33,8 @@ import pandas as pd
 CORPUS_PATH=sys.argv[1]
 
 hash_paths={}
-
-for root, dirs, files in os.walk(CORPUS_PATH):
+wav_file_root = f"{CORPUS_PATH}/.."
+for root, dirs, files in os.walk(wav_file_root):
 	for filename in files:
 		if filename.endswith(".wav"):
 			wav_path=os.path.join(root,filename)
@@ -84,7 +84,7 @@ metadata_file=pd.read_csv(metadata_path,
 )
 
 #----------------------------------------------------------------------#                    
-#Iterating the Pandas Data Frame and creating the output Jasons.
+#Iterating the Pandas Data Frame and creating the output jsons.
 
 train_json=open("train_manifest.json","w")
 test_json=open("test_manifest.json","w")

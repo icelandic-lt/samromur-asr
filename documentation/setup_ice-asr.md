@@ -52,10 +52,8 @@ USER@terra:~$ conda activate kaldi-env
 If you are using Terra, the Icelandic Pronunciation Dictionary is available at `/data/asr/prondict_sr/v1/frambordabok_asr_v1.txt`
 
 If you are not using Terra, retrieve the General Pronunciation Dictionary For
-ASR at
-[http://www.malfong.is/index.php?pg=framb_talgr](http://www.malfong.is/index.php?lang=en&pg=framb_talgr).
+ASR at [Clarin.is](http://hdl.handle.net/20.500.12537/199).
 
-You will receive a URL in your email to download the `prondict_sr.zip` file.
 
 ```console
 (kaldi-env) USER@terra:~$ wget -P /home/USER -O prondict_sr.zip <URL>

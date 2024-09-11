@@ -3,7 +3,7 @@
 ## Setup Kaldi
 
 Make sure you have installed Kaldi. If not, please follow this guide:
-* [Setup Guide for Kaldi-ASR](/documentation/setup_kaldi.md)
+* [Setup Guide for Kaldi-ASR](setup_kaldi.md)
 
 
 <!-- TODO: How to get samromur data fram Clarin and set enviroment varialbes -->

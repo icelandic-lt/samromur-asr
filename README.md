@@ -8,7 +8,7 @@
 ![Docker](https://img.shields.io/badge/Docker-[Kaldi:available]-green)
 
 Creation of an Automatic Speech Recognition (ASR) system for the Samrómur speech corpus using
-[Kaldi](http://kaldi-asr.org/doc/about.html).
+[Kaldi](http://kaldi-asr.org/doc/about.html) and [NeMo](https://github.com/NVIDIA/NeMo).
 
 ## Overview
 
@@ -19,19 +19,21 @@ part of the [Icelandic Language Technology Programme](https://github.com/iceland
 - **Domain:** Server
 - **Languages:** C++, Python, Shell
 - **Language Version/Dialect:**
-  - Python: 3.8+
+  - Python: 3.7+
   - C++: C++14 (Kaldi)
 - **Audience**: Developers, Researchers
-- **Origin:** [samromur-asr](https://github.com/cadia-lvl/samromur-asr)
+- **Origins:** [samromur-asr](https://github.com/cadia-lvl/samromur-asr), [Samrómur NeMo Recipe 22.06](http://hdl.handle.net/20.500.12537/228)
 
 ## Status
 ![Development/Experimental](https://img.shields.io/badge/Experimental-darkviolet)
 
-It's assumed that Kaldi is installed on the running system itself. In 2024 however, one should use the official [Docker](https://hub.docker.com/r/kaldiasr/kaldi/tags) images for Kaldi or build your own container images as described [here](https://github.com/kaldi-asr/kaldi/blob/master/docker/README.md).<br>
+For the Kaldi recipes inside the directories `s5_XXX` it is assumed that Kaldi is installed on the running system itself. In 2024 however, one should use the official [Docker](https://hub.docker.com/r/kaldiasr/kaldi/tags) images for Kaldi or build your own container images as described [here](https://github.com/kaldi-asr/kaldi/blob/master/docker/README.md).<br>
 We have provided a Kaldi Docker image that can be built on `Ubuntu 22.04` or `Ubuntu 20.04` [here](docker/Dockerfile). Please refer to the [README](docker/README.md) for how to use it.
 
-Most of the documentation in this repository refers to the setup/installation of the ASR system on the Terra Linux cluster at LVL. Therefore, these scripts and documentations are tailored for that particular environment and cannot be used simply as-is.<br>
+Most of the documentation in this repository for the Kaldi-based recipes refers to the setup/installation of the ASR system on the Terra Linux cluster at LVL. Therefore, these scripts and documentations are tailored for that particular environment and cannot be used simply as-is.<br>
 Please follow [this issue](https://github.com/icelandic-lt/samromur-asr/issues/2) for an update on the progress of making the scripts more general.
+
+The Nvidia NeMo recipe in the subdirectory [n5_nemo/](n5_nemo/) uses a different framework and a different model architecture for ASR. It's still experimental and work in progress, as the inferencing side uses an outdated dependency. See issue [#3](https://github.com/icelandic-lt/samromur-asr/issues/3) for an explanation.
 
 ## System Requirements
 - Operating System: Linux
@@ -90,6 +92,8 @@ The Samrómur speech corpus is available for download at [OpenSLR](https://www.o
 
 For more information about the dataset visit [https://samromur.is/gagnasafn](https://samromur.is/gagnasafn).
 
+You can use the instructions inside the [n5_nemo](n5_nemo/Readme.md#download-samrómur-2105-dataset-8gb-size) recipe to download and unzip the dataset locally.
+
 ## 3. Setup
 
 First clone this repository and also the submodules via:
@@ -103,11 +107,13 @@ You can use these guides for reference even if you do not use Terra (a cloud clu
 - [Setup Guide for Kaldi-ASR](documentation/setup_kaldi.md)
 - [Setup Guide for Samrómur-ASR](documentation/setup_samromur-asr.md)
 
+See [training instructions](n5_nemo/Readme.md) of the NeMo recipe for training a QuartzNet ASR model.
+
 ## 4. Computing Requirements
 
 This project is developed on a computing cluster with 112 CPUs and 10 GPUs (2 GeForce GTX Titan X, 4 GeForce GTX 1080 Ti, 4 GeForce RTX 2080 Ti). All of that is definitely not needed but the neural network acoustic model training scripts are intended to be used with GPUs. No GPUs are needed to use the trained models.
 
-To do: Add training time info. My guess is around 24 hours for run.sh in s5_children on 135 hours of data.
+**To do: Add training time info.**
 
 ## 5. License
 
@@ -118,6 +124,7 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 - [Language and Voice Lab](https://lvl.ru.is/)
 - [Reykjavik University](https://www.ru.is/)
 - [Kaldi-ASR](http://kaldi-asr.org/)
+- [NeMo](https://github.com/NVIDIA/NeMo)
 
 This project was funded by the Language Technology Programme for Icelandic 2019-2023. The programme, which is managed and coordinated by [Almannarómur](https://almannaromur.is/), is funded by the Icelandic Ministry of Education, Science and Culture.
 

@@ -25,11 +25,11 @@ echo "-----------------------------------"
 # NOTE! In the future the ASR data, LM training text and pronunciation 
 #dictionary will be downloaded from online first, e.g. Clarin
 
-corpus_root=<path-to>/samromur_21.05
-deepspeech_scorer=/<path-to>/10_trials_optim_kenlm.scorer
+corpus_root=`pwd`/../data/samromur_21.05
+deepspeech_scorer=`pwd`/../data/deepspeech_scorer/10_trials_optim_kenlm.scorer
 
 #Destination of the corpus in wav version
-corpus_wav_path=/<path-to>/CORPUS
+corpus_wav_path=`pwd`/../data/samromur_21.05/WAV
 corpus_wav_name=samromur_21.05_wav
 
 #--------------------------------------------------------------------#
@@ -38,7 +38,7 @@ corpus_wav_name=samromur_21.05_wav
 
 #__________________________________________________#
 #If you are not in TERRA, choose the GPUs with this:
-#CUDA_DEVICE_ORDER="PCI_BUS_ID"
+export CUDA_DEVICE_ORDER="PCI_BUS_ID"
 #CUDA_VISIBLE_DEVICES="0,1,2,3,4,5"
 #__________________________________________________#
 #If you are in TERRA, select an specific GPU

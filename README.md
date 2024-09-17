@@ -8,7 +8,7 @@
 ![Docker](https://img.shields.io/badge/Docker-[Kaldi:available]-green)
 
 Creation of an Automatic Speech Recognition (ASR) system for the Samrómur speech corpus using
-[Kaldi](http://kaldi-asr.org/doc/about.html) and [NeMo](https://github.com/NVIDIA/NeMo).
+[Kaldi](http://kaldi-asr.org/doc/about.html), [NeMo](https://github.com/NVIDIA/NeMo) or [Mozilla DeepSpeech](https://github.com/mozilla/DeepSpeech).
 
 ## Overview
 
@@ -22,18 +22,21 @@ part of the [Icelandic Language Technology Programme](https://github.com/iceland
   - Python: 3.7+
   - C++: C++14 (Kaldi)
 - **Audience**: Developers, Researchers
-- **Origins:** [samromur-asr](https://github.com/cadia-lvl/samromur-asr), [Samrómur NeMo Recipe 22.06](http://hdl.handle.net/20.500.12537/228)
+- **Origins:** [samromur-asr](https://github.com/cadia-lvl/samromur-asr), [Samrómur NeMo Recipe 22.06](http://hdl.handle.net/20.500.12537/228), [Samrómur DeepSpeech Recipe 22.06](http://hdl.handle.net/20.500.12537/229)
 
 ## Status
 ![Development/Experimental](https://img.shields.io/badge/Experimental-darkviolet)
 
 For the Kaldi recipes inside the directories `s5_XXX` it is assumed that Kaldi is installed on the running system itself. In 2024 however, one should use the official [Docker](https://hub.docker.com/r/kaldiasr/kaldi/tags) images for Kaldi or build your own container images as described [here](https://github.com/kaldi-asr/kaldi/blob/master/docker/README.md).<br>
 We have provided a Kaldi Docker image that can be built on `Ubuntu 22.04` or `Ubuntu 20.04` [here](docker/Dockerfile). Please refer to the [README](docker/README.md) for how to use it.
-
 Most of the documentation in this repository for the Kaldi-based recipes refers to the setup/installation of the ASR system on the Terra Linux cluster at LVL. Therefore, these scripts and documentations are tailored for that particular environment and cannot be used simply as-is.<br>
 Please follow [this issue](https://github.com/icelandic-lt/samromur-asr/issues/2) for an update on the progress of making the scripts more general.
 
-The Nvidia NeMo recipe in the subdirectory [n5_nemo/](n5_nemo/) uses a different framework and a different model architecture for ASR. It's still experimental and work in progress, as the inferencing side uses an outdated dependency. See issue [#3](https://github.com/icelandic-lt/samromur-asr/issues/3) for an explanation.
+The Nvidia NeMo recipe in the subdirectory [n5_nemo/](n5_nemo/) uses a different framework and a different model architecture for ASR. It's experimental, as the inferencing side uses an outdated dependency. See issue [#3](https://github.com/icelandic-lt/samromur-asr/issues/3) for an explanation.
+
+The Mozilla DeepSpeech recipe in the subdirectory [d5_deepspeech/](d5_deepspeech/) uses the Mozilla DeepSpeech framework, which is nowadays unmaintained and unfortunately the models cannot be built anymore, at least with the provided instructions.
+
+Although the last 2 recipes are currently not usable as-is, they might give some valuable insights for future research and development.
 
 ## System Requirements
 - Operating System: Linux
@@ -126,22 +129,10 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 - [Kaldi-ASR](http://kaldi-asr.org/)
 - [NeMo](https://github.com/NVIDIA/NeMo)
 
-This project was funded by the Language Technology Programme for Icelandic 2019-2023. The programme, which is managed and coordinated by [Almannarómur](https://almannaromur.is/), is funded by the Icelandic Ministry of Education, Science and Culture.
-
 ## 7. Contributing
 
-Pull requests are welcome. For significant changes, please open an issue first to discuss what you would like to change.
-For more information, please take a look at [LVL Software Development Guidelines](https://github.com/cadia-lvl/SoftwareDevelopmentGuidelines).
+Pull requests are welcome. Please open an issue first to discuss what you would like to change.
 
-## 8. Contributors
+## 8 Acknowledgements
 
-<a href="https://github.com/cadia-lvl/samromur-asr/graphs/contributors">
-  <img src="https://contributors-img.web.app/image?repo=cadia-lvl/samromur-asr" />
-</a>
-<!-- Made with [contributors-img](https://contributors-img.web.app). -->
-
-[Become a contributor](https://github.com/cadia-lvl/samromur-asr/pulls)
-
-<p align="center">
-🌟 PLEASE STAR THIS REPO IF YOU FOUND SOMETHING INTERESTING 🌟
-</p>
+This project was funded by the Language Technology Programme for Icelandic 2019-2023. The programme, which is managed and coordinated by [Almannarómur](https://almannaromur.is/), was funded by the Icelandic Ministry of Education, Science and Culture.

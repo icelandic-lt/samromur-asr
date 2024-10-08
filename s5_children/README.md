@@ -40,10 +40,63 @@ argument to `run.sh`.
 If the recipe finishes successfully you'll end up with a Kaldi chain model in
 `exp/chain/tdnn_7n_sp`.
 
+## Inference
+
+To use the trained model for inference you can e.g. run a [Tiro Speech
+Core](https://github.com/icelandic-lt/tiro-speech-core) server by packaging the
+model using
+[prepare_chain_dist.sh](https://github.com/icelandic-lt/tiro-speech-core/blob/master/tools/models/prepare_chain_dist.sh).
+
+Inference on single audio files can also be done using the Kaldi CLI
+tools. First you have to prepare an "online decoding" directory:
+
+``` shell
+docker run -v $PWD/..:/samromur-asr \
+           -v BASE_PATH_FOR_BOTH_SAMROMUR_DATASETS:/datasets \
+           -w /samromur-asr/s5_children \
+           -it samromur-asr/kaldi:gpu-latest \
+           --gpus all \
+           steps/online/nnet3/prepare_online_decoding.sh \
+             data/lang exp/nnet3/extractor exp/chain/tdnn_7n_sp exp/chain/tdnn_7n_sp_online
+```
+
+And then you decode an audio file in `BASE_PATH_FOR_AUDIO`:
+
+``` shell
+docker run -v $PWD/..:/samromur-asr \
+           -v BASE_PATH_FOR_AUDIO:/audio \
+           -v BASE_PATH_FOR_BOTH_SAMROMUR_DATASETS:/datasets \
+           -w /samromur-asr/s5_children \
+           -it samromur-asr/kaldi:gpu-latest \
+           --gpus all \
+           bash -c '\
+           . path.sh && \
+           online2-wav-nnet3-latgen-faster \
+             --acoustic-scale=1.0 \
+             --online=false \
+             --mfcc-config=exp/chain/tdnn_7n_sp_online/conf/mfcc.conf \
+             --ivector-extraction-config=exp/chain/tdnn_7n_sp_online/conf/ivector_extractor.conf \
+             exp/chain/tdnn_7n_sp/final.mdl \
+             exp/chain/tdnn_7n_sp/graph/HCLG.fst \
+             ark:<(echo "speaker1 utterance1") \
+             scp:<(echo "utterance1 sox /audio/example.wav -esigned -c1 -r16k -b16 -twav - |") \
+             ark:- \
+             | lattice-best-path \
+                 --acoustic-scale=1.0 \
+                 ark:- \
+                 "ark,t:|utils/int2sym.pl -f 2- data/lang/words.txt"'
+```
+
+Note that the Kaldi CLI tools operate on [tables of
+data](http://kaldi-asr.org/doc/io_tut.html#io_tut_table), so `ark:<(echo
+"speaker1 utterance1")` creates a temporary table that maps the audio
+`utterance1` to a speaker called `speaker1` and `scp:<(echo "utterance1 sox
+/audio/example.wav -esigned -c1 -r16k -b16 -twav - |")` is a temporary table that for
+the audio `utterance1` invokes a `sox` command to convert the input audio file
+to the correct format.
 
 ## Datasets
 
 The Samrómur and Samrómur Children corpora is available for download at
 CLARIN-IS: [Samrómur 21.05](http://hdl.handle.net/20.500.12537/189) and
 [Samrómur Children 21.09](http://hdl.handle.net/20.500.12537/185).
-

@@ -112,6 +112,8 @@ You can use these guides for reference even if you do not use Terra (a cloud clu
 
 See [training instructions](n5_nemo/Readme.md) of the NeMo recipe for training a QuartzNet ASR model.
 
+See [training instructions in s5_children](s5_children/README.md) of how to train a Kaldi chain TDNN ASR model on both the base Samrómur corpus and Samrómur Children.
+
 ## 4. Computing Requirements
 
 This project is developed on a computing cluster with 112 CPUs and 10 GPUs (2 GeForce GTX Titan X, 4 GeForce GTX 1080 Ti, 4 GeForce RTX 2080 Ti). All of that is definitely not needed but the neural network acoustic model training scripts are intended to be used with GPUs. No GPUs are needed to use the trained models.

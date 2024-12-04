@@ -22,7 +22,7 @@ part of the [Icelandic Language Technology Programme](https://github.com/iceland
   - Python: 3.7+
   - C++: C++14 (Kaldi)
 - **Audience**: Developers, Researchers
-- **Origins:** [samromur-asr](https://github.com/cadia-lvl/samromur-asr), [Samrómur NeMo Recipe 22.06](http://hdl.handle.net/20.500.12537/228), [Samrómur DeepSpeech Recipe 22.06](http://hdl.handle.net/20.500.12537/229)
+- **Origins:** [samromur-asr](https://github.com/cadia-lvl/samromur-asr), [Samrómur NeMo Recipe 22.06](http://hdl.handle.net/20.500.12537/228), [Samrómur DeepSpeech Recipe 22.06](http://hdl.handle.net/20.500.12537/229), [Samrómur-Adolescents Recipe 22.06](http://hdl.handle.net/20.500.12537/221), [L2 Speakers Recipe 22.10](http://hdl.handle.net/20.500.12537/291), [Recipe for Samrómur Underage](https://github.com/cadia-lvl/samromur-asr/tree/s5_underage_lstm)
 
 ## Status
 ![Development/Experimental](https://img.shields.io/badge/Experimental-darkviolet)
